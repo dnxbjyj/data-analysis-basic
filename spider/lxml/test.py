@@ -34,17 +34,18 @@ def parse_html_by_lxml(html_content):
     :return: 以城市名为key、房价为vlaue的字典
     '''
     html = etree.HTML(html_content)
-    cities = html.xpath('//*[@id="order_f"]/tr/td[2]/a/text()')
-    cities = [c.strip() for c in cities]
-    prices = html.xpath('//*[@id="order_f"]/tr/td[3]/text()')
-    prices = [p.strip() for p in prices]
-    # 把数字字符串转为整数
-    prices = [int(''.join([d for d in price_str if d != ','])) for price_str in prices]
-    
-    price_tuples = zip(cities,prices)
+    # 获取行数据列表
+    tr_list = html.xpath('//*[@id="order_f"]/tr')
     price_dict = OrderedDict()
-    for price_tuple in price_tuples:
-        price_dict[price_tuple[0]] = price_tuple[1]
+    # 遍历行数据列表，解析出每一行的城市名和房价数据
+    for tr in tr_list:
+        # 这里要使用相对路径：'./'
+        city = tr.xpath('./td[2]/a/text()')[0].strip()
+        price_str = tr.xpath('./td[3]/text()')[0].strip()
+        # 把数字字符串转为整数
+        price = int(''.join([d for d in price_str if d != ',']))
+        price_dict[city] = price
+
     return price_dict
     
 def main():
