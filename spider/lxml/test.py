@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup as BS
 from collections import OrderedDict
 from lxml import etree
 import json
+import re
 
 import sys
 reload(sys)
@@ -39,6 +40,10 @@ def parse_html_by_lxml(html_content):
     price_dict = OrderedDict()
     # 遍历行数据列表，解析出每一行的城市名和房价数据
     for tr in tr_list:
+        s = tr.xpath('string(.)').strip()
+        # 打印出当前行的所有文本，不同列用空格隔开
+        print re.sub(r'\s+',' ',s)
+        
         # 这里要使用相对路径：'./'
         city = tr.xpath('./td[2]/a/text()')[0].strip()
         price_str = tr.xpath('./td[3]/text()')[0].strip()
@@ -54,6 +59,7 @@ def main():
         html_content = unicode(fin.read(),'utf-8')
         
     print json.dumps(parse_html_by_BeautifulSoup(html_content)).decode('unicode-escape').encode('gbk')
+    print '\n'
     print json.dumps(parse_html_by_lxml(html_content)).decode('unicode-escape').encode('gbk')
 
 if __name__ == '__main__':
